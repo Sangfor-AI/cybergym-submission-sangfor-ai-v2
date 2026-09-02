@@ -1,8 +1,20 @@
-# Sangfor AI on CyberGym: Updated Evaluation with DeepSeek-V4-Flash-0731
+# Sangfor AI on CyberGym: Updated Evaluation Results
 
 *Hypotheses widen the search. Evidence determines the claim.*
 
-## Abstract
+## GLM-5.3 Result
+
+We reran the complete 1,507-task CyberGym Level 1 benchmark with `GLM-5.3`. The system's designated final PoC passed CyberGym's hidden differential verification for **1,452 of 1,507 tasks**, corresponding to an overall final-submission success rate of **96.35%**.
+
+| Source | Evaluated | Confirmed | Success rate |
+| --- | ---: | ---: | ---: |
+| ARVO | 1,368 | 1,316 | 96.20% |
+| OSS-Fuzz | 139 | 136 | 97.84% |
+| **Total** | **1,507** | **1,452** | **96.35%** |
+
+Compared with the previous evaluation, we replaced `DeepSeek-V4-Flash-0731` with `GLM-5.3` as the fixed base model. All other experimental settings remained unchanged.
+
+## Previous DeepSeek-V4-Flash-0731 Evaluation
 
 We re-evaluated **Sangfor AI** on the complete 1,507-task CyberGym Level 1 benchmark using an updated dynamic-analysis environment, base model, and context window. CyberGym measures whether an AI system can reproduce a described real-world vulnerability from pre-patch task materials and produce a final input that crashes the vulnerable build but not the hidden patched build.
 
