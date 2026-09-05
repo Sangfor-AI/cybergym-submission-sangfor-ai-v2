@@ -4,15 +4,15 @@
 
 ## GLM-5.3 Result
 
-We reran the complete 1,507-task CyberGym Level 1 benchmark with `GLM-5.3`. The system's designated final PoC passed CyberGym's hidden differential verification for **1,452 of 1,507 tasks**, corresponding to an overall final-submission success rate of **96.35%**.
+We reran the complete 1,507-task CyberGym Level 1 benchmark with `GLM-5.3`. The system's designated final PoC passed CyberGym's hidden differential verification for **1,465 of 1,507 tasks**, corresponding to an overall final-submission success rate of **97.21%**.
 
 | Source | Evaluated | Confirmed | Success rate |
 | --- | ---: | ---: | ---: |
-| ARVO | 1,368 | 1,316 | 96.20% |
+| ARVO | 1,368 | 1,329 | 97.15% |
 | OSS-Fuzz | 139 | 136 | 97.84% |
-| **Total** | **1,507** | **1,452** | **96.35%** |
+| **Total** | **1,507** | **1,465** | **97.21%** |
 
-Compared with the previous evaluation, we replaced `DeepSeek-V4-Flash-0731` with `GLM-5.3` as the fixed base model. All other experimental settings remained unchanged.
+Compared with the previous DeepSeek evaluation documented below, we used `GLM-5.3` and adjusted the per-task time limit to 480 minutes to account for the inference speed of our local deployment. All other experimental settings remained unchanged.
 
 ## Previous DeepSeek-V4-Flash-0731 Evaluation
 
@@ -20,7 +20,7 @@ We re-evaluated **Sangfor AI** on the complete 1,507-task CyberGym Level 1 bench
 
 Sangfor AI is built around an Agent Swarm that investigates complementary vulnerability hypotheses while maintaining a strict separation between exploration and final acceptance. Under the updated configuration, the system solved **1,404 of 1,507 tasks**, achieving an overall benchmark success rate of **93.17%** under the final-submission metric. This supersedes our previous result of 1,301 tasks and 86.3%.
 
-## Updated Result
+### Updated Result
 
 | Source | Evaluated | Confirmed | Success rate |
 | --- | ---: | ---: | ---: |
@@ -30,17 +30,17 @@ Sangfor AI is built around an Agent Swarm that investigates complementary vulner
 
 A task is counted as confirmed only when the single PoC designated as the final submission passes CyberGym's hidden differential verification. Intermediate crashes and non-zero exits are not counted as successful results by themselves.
 
-## What Changed
+### What Changed
 
 The Agent Swarm and evidence-governance principles remain the foundation of the system. The principal changes in this evaluation were the runtime environment, fixed base model, and context window.
 
-### Task-specific dynamic environment
+#### Task-specific dynamic environment
 
 The previous evaluation used a generic Debian-based build image with standard compilers and build tools. The updated evaluation used CyberGym's official task-specific vulnerable images. These images provide project-specific build environments, third-party dependencies, fuzz targets, and sanitizer support that are not consistently available in a generic image. This allowed the Agent Swarm to perform more complete build, execution, fuzzing, and runtime validation before selecting a final candidate.
 
 The Agent could execute candidate inputs only against the vulnerable task environment. The patched image and all post-patch verification outputs remained host-side and unavailable during the task.
 
-### Base model and context window
+#### Base model and context window
 
 `DeepSeek-V4-Flash-0731` was used consistently by every agent in the updated evaluation. The previous `GLM-5.2` configuration used a 400K-token context window under practical local-deployment constraints, while the updated model was served with a 1M-token context window. The task-level isolation and final-submission policy remained unchanged throughout the benchmark run.
 
@@ -48,7 +48,7 @@ The larger context window reduced the need for lossy context compression during 
 
 These changes were evaluated together, so the updated score represents the combined system configuration rather than a controlled ablation of any single change.
 
-## Evaluation Protocol
+### Evaluation Protocol
 
 | Item | Updated evaluation setting |
 | --- | --- |
@@ -63,7 +63,7 @@ These changes were evaluated together, so the updated score represents the combi
 | Scoring | At most one designated final PoC; hidden host-side post-patch verification |
 | Repetitions | One valid run per task; reruns only for independently identified infrastructure failures |
 
-### Information isolation and leakage controls
+#### Information isolation and leakage controls
 
 Before the vulnerable task image was made available to the Agent, required build dependencies missing from the Level 1 repository archive were copied from the official image's `/src` directory into an isolated `repo_copy`. All pre-existing Git metadata in that copy was then removed and replaced with a clean baseline Git history containing only a single `initial commit`; `/src` and `/tmp` were subsequently cleared. The Agent-visible task materials and this isolated source baseline were staged under `/workspace`, while code-enforced read/write boundaries limited each Worker to its assigned scope.
 
